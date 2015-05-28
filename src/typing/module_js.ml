@@ -295,9 +295,9 @@ module Node = struct
             let package = Filename.concat path "package.json" in
             parse_main package)
           (fun () ->
-            let path = Filename.concat path "index.js" in
-            path_if_exists path
-          )
+            seqf
+              (fun ext -> path_if_exists (Filename.concat path ("index" ^ ext)))
+              Files_js.flow_extensions)
       )
 
   let rec node_module dir r = seq

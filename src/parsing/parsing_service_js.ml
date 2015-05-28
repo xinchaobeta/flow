@@ -62,7 +62,12 @@ let execute_hook file ast =
 let delete_file fn =
   execute_hook fn None
 
+let extensions_hook content file =  
+  if Filename.check_suffix file ".styl" then "module.exports = ''"
+  else content
+
 let do_parse ?(keep_errors=false) content file =
+  let content = extensions_hook content file in
   try (
     let ast, parse_errors = Parser_flow.program_file content file in
     assert (parse_errors = []);

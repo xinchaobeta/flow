@@ -16,6 +16,7 @@ open Modes_js
 let flow_extensions = [
     ".js"  ;      (* Standard JavaScript files *)
     ".jsx" ;      (* JavaScript files with JSX *)
+    ".styl";      (* Stylus files *)
   ]
 
 let is_directory path = try Sys.is_directory path with Sys_error _ -> false
