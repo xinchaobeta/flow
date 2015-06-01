@@ -204,8 +204,8 @@ let rec seqf f = function
 (* only purpose here is to guarantee a case-sensitive file exists
    and try to keep it from being too horrendously expensive *)
 
-let case_sensitive =
-  not (Sys.file_exists (String.uppercase (Sys.getcwd ())))
+let case_sensitive = true
+  (* not (Sys.file_exists (String.uppercase (Sys.getcwd ()))) *)
 
 (* map of dirs to file lists *)
 let files_in_dir = ref SMap.empty
@@ -319,6 +319,17 @@ module Node = struct
     then resolve_relative dir import_str
     else node_module dir import_str
 
+  let resolve_symbol_link path =
+      let dir = Filename.dirname path in
+      let file = Filename.basename path in 
+      try
+        let orig = Sys.getcwd () in
+        Sys.chdir dir;
+        let realdir = Sys.getcwd () in
+        Sys.chdir orig;
+        Filename.concat realdir file
+      with _ -> path
+
   let imported_module file import_str =
     let candidates = module_name_candidates import_str in
 
@@ -328,7 +339,7 @@ module Node = struct
       | None -> resolve_import file candidate
     in
     match List.fold_left choose_candidate None candidates with
-    | Some(str) -> str
+    | Some(str) -> resolve_symbol_link str
     | None -> import_str
 
   (* in node, file names are module names, as guaranteed by
